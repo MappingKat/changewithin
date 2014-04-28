@@ -7,7 +7,10 @@ with [mailgun](http://www.mailgun.com/).
 
 This script was forked from the [osmlab/changewithin](https://github.com/osmlab/changewithin) repository and enhanced to assist NPS iteratively explore integrating more OpenStreetMap geo data into the production of Park Tiles. Now the script has been improved to capture ways and nodes, with any tags set in the configuration file. This gives NPS access to all data from the changesets, and the control to tweak the amount of information monitored as they iterate on the Park Tiles data workflow.
 
-**Reports are located in the Report directory.**
+**Reports are located in the lib directory.**
+
+0 7 * * * ~/venv-changewithin/bin/python ~/lib/changewithin.py
+
 
 #### Enhancements
  - Script detects changes in Great Smoky Mtn National park

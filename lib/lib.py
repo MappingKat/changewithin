@@ -1,5 +1,6 @@
 ''' Support functions for changewithin.py script.
 '''
+
 import time, json, requests, os, sys
 from lxml import etree
 from sets import Set
@@ -18,7 +19,7 @@ def getosc():
     # zero-pad state so it can be safely split.
     state = '000000000' + state
     path = '%s/%s/%s' % (state[-9:-6], state[-6:-3], state[-3:])
-    
+
     # prepare a local file to store changes
     handle, filename = mkstemp(prefix='change-', suffix='.osc.gz')
     os.close(handle)
@@ -26,13 +27,13 @@ def getosc():
     stateurl = 'http://planet.openstreetmap.org/replication/day/%s.osc.gz' % path
     sys.stderr.write('downloading %s...\n' % stateurl)
     status = os.system('wget --quiet %s -O %s' % (stateurl, filename))
-    
+
     if status:
         status = os.system('curl --silent %s -o %s' % (stateurl, filename))
-    
+
     if status:
         raise Exception('Failure from both wget and curl')
-    
+
     sys.stderr.write('extracting %s...\n' % filename)
     os.system('gunzip -f %s' % filename)
 
@@ -74,39 +75,39 @@ def getExtent(s):
     m = MercatorProjection(0)
 
     points = [[float(s['max_lat']), float(s['min_lon'])], [float(s['min_lat']), float(s['max_lon'])]]
-    
+
     if (points[0][0] - points[1][0] == 0) or (points[1][1] - points[0][1] == 0):
         extent['lat'] = points[0][0]
         extent['lon'] = points[1][1]
         extent['zoom'] = 18
     else:
         i = float('inf')
-         
+
         w = 800
         h = 600
-         
+
         tl = [min(map(lambda x: x[0], points)), min(map(lambda x: x[1], points))]
         br = [max(map(lambda x: x[0], points)), max(map(lambda x: x[1], points))]
-         
+
         c1 = m.locationCoordinate(Location(tl[0], tl[1]))
         c2 = m.locationCoordinate(Location(br[0], br[1]))
-         
+
         while (abs(c1.column - c2.column) * 256.0) < w and (abs(c1.row - c2.row) * 256.0) < h:
             c1 = c1.zoomBy(1)
             c2 = c2.zoomBy(1)
-         
+
         center = m.coordinateLocation(Coordinate(
             (c1.row + c2.row) / 2,
             (c1.column + c2.column) / 2,
             c1.zoom))
-        
+
         extent['lat'] = center.lat
         extent['lon'] = center.lon
         if c1.zoom > 18:
             extent['zoom'] = 18
         else:
             extent['zoom'] = c1.zoom
-        
+
     return extent
 
 def getaddresstags(tags):
@@ -116,7 +117,7 @@ def getaddresstags(tags):
         if key.split(':')[0] == 'addr':
             addr_tags.append(t.attrib)
     return addr_tags
-    
+
 def hasaddresschange(gid, addr, version, elem):
     url = 'http://api.openstreetmap.org/api/0.6/%s/%s/history' % (elem, gid)
     r = requests.get(url)
@@ -151,7 +152,7 @@ def loadChangeset(changeset):
     changeset['map_img'] = 'http://api.tiles.mapbox.com/v3/lxbarth.map-lxoorpwz/%s,%s,%s/300x225.png' % (extent['lon'], extent['lat'], extent['zoom'])
     changeset['map_link'] = 'http://www.openstreetmap.org/?lat=%s&lon=%s&zoom=%s&layers=M' % (extent['lat'], extent['lon'], extent['zoom'])
     changeset['addr_count'] = len(changeset['addr_chg_way']) + len(changeset['addr_chg_nd'])
-    # the building count is determined by length of way IDs that got through 
+    # the building count is determined by length of way IDs that got through
     changeset['way_count'] = len(changeset['wids'])
     changeset['node_count'] = len(changeset['nids'])
     return changeset
@@ -243,7 +244,7 @@ html_changes_tmpl = '''
 {{#node_count}}Changed nodes ({{node_count}}): {{#nids}}<a href='http://openstreetmap.org/browse/node/{{.}}/history' style='text-decoration:none;color:#3879D9;'>#{{.}}</a> {{/nids}}{{/node_count}}
 </p>
 <p style='font-size:14px;line-height:17px;margin-top:5px;margin-bottom:20px;'>
-{{#addr_count}}Changed addresses ({{addr_count}}): {{#addr_chg_nd}}<a href='http://openstreetmap.org/browse/node/{{.}}/history' style='text-decoration:none;color:#3879D9;'>#{{.}}</a> {{/addr_chg_nd}}{{#addr_chg_way}}<a href='http://openstreetmap.org/browse/way/{{.}}/history' style='text-decoration:none;color:#3879D9;'>#{{.}}</a> 
+{{#addr_count}}Changed addresses ({{addr_count}}): {{#addr_chg_nd}}<a href='http://openstreetmap.org/browse/node/{{.}}/history' style='text-decoration:none;color:#3879D9;'>#{{.}}</a> {{/addr_chg_nd}}{{#addr_chg_way}}<a href='http://openstreetmap.org/browse/way/{{.}}/history' style='text-decoration:none;color:#3879D9;'>#{{.}}</a>
 {{/addr_chg_way}}
 {{/addr_count}}
 </p>
@@ -266,7 +267,7 @@ Total address changes: {{addr}}
 
 {{#ways}}
 -----------
-Ways: 
+Ways:
 Total 'building' changes:{{building}}
 Total 'highway' changes: {{highway}}
 Total 'leisure' changes: {{leisure}}

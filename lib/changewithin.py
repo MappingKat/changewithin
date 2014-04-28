@@ -14,7 +14,7 @@ dir_path = os.path.dirname(os.path.abspath(__file__))
 
 #
 # Configure for use. See config.ini for details.
-# 
+#
 config = ConfigParser()
 config.read(os.path.join(dir_path, 'config.ini'))
 
@@ -88,7 +88,7 @@ for event, n in context:
                 ntags = n.findall(".//tag[@k]")
                 addr_tags = getaddresstags(ntags)
                 version = int(n.get('version'))
-                
+
                 # Capture address changes
                 if version != 1:
                     if hasaddresschange(nid, addr_tags, version, 'node'):
@@ -153,7 +153,7 @@ for event, w in context:
                         t = tag.get('k')
                 version = int(w.get('version'))
                 addr_tags = getaddresstags(wtags)
-                
+
                 # Capture address changes
                 if version != 1:
                     if hasaddresschange(wid, addr_tags, version, 'way'):
@@ -201,7 +201,7 @@ for c in cids:
 
 for tag in occurringtags:
     values = map(loadChangeset, changesets[tag].values())
-    for each in values: 
+    for each in values:
         for c in cids:
             if c == each['id']:
                 finalobject[c].append(each)
