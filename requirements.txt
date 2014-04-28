@@ -1,5 +1,4 @@
---allow-all-external
---allow-unverified modestmaps
+
 
 lxml==3.2.1
 pystache==0.5.3
