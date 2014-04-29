@@ -1,2 +1,2 @@
 worker: python changewithin.py
-web: http-server
+web: python SimpleHTTPServer
